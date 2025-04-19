@@ -120,7 +120,7 @@ enemy_speed = 2
 # Ratas
 rats = []
 RAT_EVENT = pygame.USEREVENT + 3
-pygame.time.set_timer(RAT_EVENT, random.randint(3000, 15000))
+pygame.time.set_timer(RAT_EVENT, random.randint(4000, 7000))
 
 # Textos flotantes
 floating_texts = []
@@ -447,3 +447,9 @@ while running:
     pygame.display.update()
 
 pygame.quit()
+flag_background = pygame.image.load("resource_path/backgrounds/bandera.png")  # Cambia 'bandera.png' por el nombre correcto
+flag_background = pygame.transform.scale(flag_background, (800, 600))  # Ajusta al tamaño de tu pantalla
+if level == 5:
+    win.blit(flag_background, (0, 0))  # Mostrar la bandera como fondo
+else:
+    win.fill((0, 0, 0))  # Fondo normal (negro) o usa tu fondo por defecto
