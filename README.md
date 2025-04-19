@@ -1,5 +1,7 @@
 # 🎮 Fall Items
 
+Jon Urrutia Noceda <jon@mendikat.es>
+
 ¡Bienvenido a *Fall Items*!
 Un videojuego en 2D lleno de enemigos, power-ups, ratas traicioneras y jefes malvados.
 Ayuda a la protagonista a sobrevivir y vencer en cada nivel… ¡o caer en el intento!
@@ -44,7 +46,7 @@ Ayuda a la protagonista a sobrevivir y vencer en cada nivel… ¡o caer en el in
 ## 📁 Requerimientos
 
 - Python 3.8+.
-- pip3.
+- pip 3.x.
 - git.
 
 Utiliza la librería pygames.
@@ -57,7 +59,6 @@ Instalar las dependencias:
 
 ```
 pip install -r requirements.txt
-
 ```
 
 Ejecutar el juego:
