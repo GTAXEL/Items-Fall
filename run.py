@@ -5,7 +5,7 @@ import random
 import os
 import sys
 
-from Rat import Rat  # Esto importa la clase Rat del archivo Rat.py
+from objects.Rat import Rat  # Esto importa la clase Rat del archivo Rat.py
 
 # Función para encontrar la ruta correcta para los recursos
 def resource_path(relative_path):
@@ -139,7 +139,7 @@ score = 0
 lives = 3
 
 # Carga la fuente de letra
-font_path = resource_path("fonts/ARCADE_I.ttf") 
+font_path = resource_path("fonts/ARCADE_I.ttf")
 font = pygame.font.Font(font_path, 16)
 
 # Jefe
@@ -205,7 +205,7 @@ running = True
 castle_them.play()
 while running:
     clock.tick(60)
-    
+
     # Fondo según el nivel
     if level == 4:
         win.blit(soccer_field_sprite, (0, 0))
@@ -314,7 +314,7 @@ while running:
             win.blit(bomb_sprite, (rect.x, rect.y))
         else:
             pygame.draw.rect(win, color, rect)
-        
+
         if rect.y > HEIGHT:
             powerups.remove(powerup)
         elif player_rect.colliderect(rect):
@@ -354,7 +354,7 @@ while running:
     # Movimiento de las ratas
     for rat in rats[:]:
         rat.update()  # Actualizar la posición de la rata
-        
+
         if rat.rect.x > WIDTH:
             rats.remove(rat)
             continue  # Saltarse lo demás si ya se eliminó
@@ -412,7 +412,7 @@ while running:
 
     # Justificación a la derecha
     text_width = hud_render.get_width()
-    win.blit(hud_render, (WIDTH - text_width - 10, 10)) 
+    win.blit(hud_render, (WIDTH - text_width - 10, 10))
 
     if lives <= 0:
         font_game_over = pygame.font.Font(font_path, 36)
@@ -421,7 +421,7 @@ while running:
         pygame.display.update()
         castle_them.stop()
         keys = pygame.key.get_pressed()
-        
+
         # Verificar si el puntaje es más alto que el High Score
         if score > high_score:
             high_score = score
