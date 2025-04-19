@@ -120,7 +120,7 @@ enemy_speed = 2
 # Ratas
 rats = []
 RAT_EVENT = pygame.USEREVENT + 3
-pygame.time.set_timer(RAT_EVENT, random.randint(4000, 7000))
+pygame.time.set_timer(RAT_EVENT, random.randint(3000, 5000))
 
 # Textos flotantes
 floating_texts = []
