@@ -1,1 +1,5 @@
+# Ignore high score files
 high-score.txt
+
+# Ignore Python cache files
+/__pycache__
