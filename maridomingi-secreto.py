@@ -156,12 +156,26 @@ next_boss_score = 10000
 
 clock = pygame.time.Clock()
 
+def load_high_score():
+    try:
+        with open("high-score.txt", "r") as file:
+            high_score = int(file.read())  # Leer el puntaje desde el archivo
+    except FileNotFoundError:
+        high_score = 0  # Si el archivo no existe, iniciamos con 0
+    print(high_score)
+    return high_score
+
+def save_high_score(score):
+    with open("high-score.txt", "w") as file:
+        file.write(str(score))  # Guardar el puntaje en el archivo
+
 def show_start_screen():
     win.fill(BLACK)
     title = font.render("EL MARIDOMINGI SECRETO", True, WHITE)
     instructions = font.render("Presiona ENTER para comenzar", True, WHITE)
     win.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 50))
     win.blit(instructions, (WIDTH // 2 - instructions.get_width() // 2, HEIGHT // 2))
+
     pygame.display.update()
     waiting = True
     while waiting:
@@ -180,6 +194,9 @@ def draw_boss_health_bar():
         pygame.draw.rect(win, RED, (boss_x - 10, boss_y - 30, health_bar_width, health_bar_height))
         pygame.draw.rect(win, GREEN, (boss_x - 10, boss_y - 30, health_bar_width * (boss_health / (100 + (level * 20))), health_bar_height))
         pygame.draw.rect(win, WHITE, (boss_x - 10, boss_y - 30, health_bar_width, health_bar_height), 2)
+
+# Carga la puntuación máxima
+high_score = load_high_score()
 
 show_start_screen()
 
@@ -389,7 +406,7 @@ while running:
 
         draw_boss_health_bar()
 
-    hud_text = f"Puntos: {pad_score(score)}   Vidas: {pad_two_digits(lives)}   Nivel: {pad_two_digits(level)}"
+    hud_text = f" Hi: {pad_score(high_score)}  Score: {pad_score(score)}  Lives: {pad_two_digits(lives)}   Level: {pad_two_digits(level)}"
     hud_render = font.render(hud_text, True, YELLOW)
 
     # Justificación a la derecha
@@ -404,6 +421,11 @@ while running:
         castle_them.stop()
         keys = pygame.key.get_pressed()
         
+        # Verificar si el puntaje es más alto que el High Score
+        if score > high_score:
+            high_score = score
+            save_high_score(high_score)  # Guardar el nuevo High Score
+
         # Espera 5 segundos antes de seguir
         pygame.time.delay(5000)
         sys.exit()
