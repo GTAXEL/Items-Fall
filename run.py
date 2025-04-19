@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+2# -*- coding: utf-8 -*-
 
 import pygame
 import random
@@ -92,6 +92,7 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
+LIME = (92, 233, 0)
 
 # Jugador
 player_size = 50
@@ -170,9 +171,9 @@ def save_high_score(score):
         file.write(str(score))  # Guardar el puntaje en el archivo
 
 def show_start_screen():
-    win.fill(BLACK)
-    title = font.render("EL MARIDOMINGI SECRETO", True, WHITE)
-    instructions = font.render("Presiona ENTER para comenzar", True, WHITE)
+    win.fill(LIME)
+    title = font.render("Drop Items", True, BLUE)
+    instructions = font.render("Presiona ENTER para comenzar", True, BLACK)
     win.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 50))
     win.blit(instructions, (WIDTH // 2 - instructions.get_width() // 2, HEIGHT // 2))
 
