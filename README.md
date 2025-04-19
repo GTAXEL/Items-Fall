@@ -55,12 +55,14 @@ https://www.pygame.org/docs/
 
 Instalar las dependencias:
 
-{code}
+```
 pip install -r requirements.txt
-{code}
+
+```
 
 Ejecutar el juego:
 
-{code}
+```
 python3 maridomingi-secreto.py
-{code}
+
+```
