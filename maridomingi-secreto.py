@@ -28,10 +28,9 @@ pygame.mixer.init()
 # Cargar sonidos
 shoot_sound = pygame.mixer.Sound(resource_path("sounds/disparo.wav"))
 hit_sound = pygame.mixer.Sound(resource_path("sounds/impacto.wav"))
-game_over_sound = pygame.mixer.Sound(resource_path("sounds/game_over.wav"))
 boss_defeat_sound = pygame.mixer.Sound(resource_path("sounds/boss_defeat.wav"))
 bonus_sound = pygame.mixer.Sound(resource_path("sounds/bonus.mp3"))
-
+castle_them = pygame.mixer.Sound(resource_path("songs/castle_them.mp3"))
 
 # Configuración de pantalla
 WIDTH, HEIGHT = 800, 600
@@ -75,6 +74,13 @@ star_sprite = pygame.transform.scale(star_sprite, (90, 75))
 enderpearl_sprite = pygame.image.load(resource_path("sprites/powerups/enderpearl.png"))
 enderpearl_sprite = pygame.transform.scale(enderpearl_sprite, (60, 60))
 
+# Bomb
+bomb_sprite = pygame.image.load(resource_path("sprites/powerups/bomb.png"))
+bomb_sprite = pygame.transform.scale(bomb_sprite, (60, 60))
+
+# Rata
+rat_sprite = pygame.image.load(resource_path("sprites/enemies/rat.png"))  # Asegúrate de que esta ruta es correcta
+rat_sprite = pygame.transform.scale(rat_sprite, (60, 40))  # Ajusta el tamaño si es necesario
 
 # Colores
 WHITE = (255, 255, 255)
@@ -109,6 +115,11 @@ ENEMY_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(ENEMY_EVENT, 1000)
 enemy_speed = 2
 
+# Ratas
+rats = []
+RAT_EVENT = pygame.USEREVENT + 3
+pygame.time.set_timer(RAT_EVENT, random.randint(3000, 15000))
+
 # Power-ups
 powerups = []
 POWERUP_EVENT = pygame.USEREVENT + 2
@@ -120,8 +131,10 @@ powerup_timer = 0
 # Score y vida
 score = 0
 lives = 3
-font_path = resource_path("fonts/ARCADE_I.ttf")  # Asegurate que el nombre sea correcto
-font = pygame.font.Font(font_path, 16)  # Ajustá el tamaño si es muy grande
+
+# Carga la fuente de letra
+font_path = resource_path("fonts/ARCADE_I.ttf") 
+font = pygame.font.Font(font_path, 16)
 
 # Jefe
 boss_health = 1000
@@ -166,6 +179,7 @@ def draw_boss_health_bar():
 show_start_screen()
 
 running = True
+castle_them.play()
 while running:
     clock.tick(60)
     
@@ -192,6 +206,11 @@ while running:
             powerup_x = random.randint(0, WIDTH - 30)
             kind = random.choice(["speed", "shield", "bomb", "life"])
             powerups.append((pygame.Rect(powerup_x, 0, 30, 30), kind))
+        if event.type == RAT_EVENT:
+            rat_x = -100
+            rat_width = rat_sprite.get_width()
+            rat_height = rat_sprite.get_height()
+            rats.append(pygame.Rect(rat_x, ground_y, rat_width, rat_height))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x > - 25:
@@ -262,6 +281,8 @@ while running:
             win.blit(star_sprite, (rect.x, rect.y))
         elif CYAN == color:
             win.blit(enderpearl_sprite, (rect.x, rect.y))
+        elif YELLOW == color:
+            win.blit(bomb_sprite, (rect.x, rect.y))
         else:
             pygame.draw.rect(win, color, rect)
         
@@ -274,18 +295,41 @@ while running:
             if kind == "speed":
                 bullet_speed = 20
             elif kind == "shield":
-                lives += 1
+                score += 5
             elif kind == "bomb":
                 enemies.clear()
                 score += 20
             elif kind == "life":
-                lives += 2
+                lives += 1
                 score += 10
             bonus_sound.play()
+
+    # Movimiento de las ratas
+    for rat in rats[:]:
+        rat.x += 2
+
+        if rat.x > WIDTH:
+            rats.remove(rat)
+            continue  # Saltarse lo demás si ya se eliminó
+
+        win.blit(rat_sprite, (rat.x + 60, rat.y + 60))
+
+        # Verificar si el jugador pasa por encima de la rata (saltó sobre ella)
+        if velocity_y > 0 and player_rect.top < rat.bottom and player_rect.bottom > rat.top:
+            # El jugador está saltando y su parte superior pasa por encima de la rata
+            score += 4
+            bonus_sound.play()  # Sonido del bonus
+        else:
+            # Detectar la colisión normal (cuando el jugador cae y toca la rata)
+            if player_rect.colliderect(rat):
+                hit_sound.play()  # Sonido del impacto
+                lives -= 1  # El jugador pierde una vida
+                rats.remove(rat)  # Eliminar la rata
+
     if score >= next_boss_score and not boss_alive:
         boss_alive = True
         boss_y = 50
-        boss_health = 100 + (level * 20)
+        boss_health = 1000 + (level * 20)
         boss_x = WIDTH // 2 - boss_size // 2
         boss_bullets.clear()
 
@@ -299,12 +343,12 @@ while running:
         for bullet in bullets[:]:
             if bullet and pygame.Rect(boss_x, boss_y, boss_size, boss_size).colliderect(bullet):
                 bullets.remove(bullet)
-                boss_health -= 10
+                boss_health -= 100
                 if boss_health <= 0:
                     boss_alive = False
                     score += 50
                     level += 1
-                    next_boss_score += 100
+                    next_boss_score += 150
                     boss_defeat_sound.play()
 
         draw_boss_health_bar()
@@ -317,16 +361,17 @@ while running:
     win.blit(hud_render, (WIDTH - text_width - 10, 10)) 
 
     if lives <= 0:
-        win.blit(font.render("GAME OVER - Presiona ESC para salir", True, RED), (WIDTH//2 - 200, HEIGHT//2))
+        font_game_over = pygame.font.Font(font_path, 36)
+
+        win.blit(font_game_over.render("GAME OVER", True, YELLOW), (WIDTH//2 - 120, HEIGHT//2))
         pygame.display.update()
-        game_over_sound.play()
+        castle_them.stop()
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
-            running = False
-        continue
+        
+        # Espera 5 segundos antes de seguir
+        pygame.time.delay(5000)
+        sys.exit()
 
     pygame.display.update()
 
 pygame.quit()
-
-
