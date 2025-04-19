@@ -64,5 +64,4 @@ Ejecutar el juego:
 
 ```
 python3 run.py
-
 ```
