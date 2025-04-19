@@ -37,7 +37,7 @@ castle_them = pygame.mixer.Sound(resource_path("songs/castle_them.mp3"))
 # Configuración de pantalla
 WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("El Maridomingi Secreto")
+pygame.display.set_caption("Drop items")
 
 # Sprites
 player_sprite_right = pygame.image.load(resource_path("sprites/maridomingi/maridomingi-right.png"))
