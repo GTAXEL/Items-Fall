@@ -50,3 +50,17 @@ Ayuda a Maridomingi a sobrevivir y vencer en cada nivel… ¡o caer en el intent
 Utiliza la librería pygames.
 
 https://www.pygame.org/docs/
+
+## 🚀 Instalación
+
+Instalar las dependencias:
+
+{code}
+pip install -r requirements.txt
+{code}
+
+Ejecutar el juego:
+
+{code}
+python3 maridomingi-secreto.py
+{code}
