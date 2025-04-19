@@ -5,6 +5,8 @@ import random
 import os
 import sys
 
+from Rat import Rat  # Esto importa la clase Rat del archivo Rat.py
+
 # Función para encontrar la ruta correcta para los recursos
 def resource_path(relative_path):
     try:
@@ -120,6 +122,9 @@ rats = []
 RAT_EVENT = pygame.USEREVENT + 3
 pygame.time.set_timer(RAT_EVENT, random.randint(3000, 15000))
 
+# Textos flotantes
+floating_texts = []
+
 # Power-ups
 powerups = []
 POWERUP_EVENT = pygame.USEREVENT + 2
@@ -137,7 +142,7 @@ font_path = resource_path("fonts/ARCADE_I.ttf")
 font = pygame.font.Font(font_path, 16)
 
 # Jefe
-boss_health = 1000
+boss_health = 100
 boss_size = 100
 boss_x = WIDTH // 2 - boss_size // 2
 boss_y = 50
@@ -147,7 +152,7 @@ boss_bullets = [99]
 
 # Nivel
 level = 1
-next_boss_score = 100
+next_boss_score = 10000
 
 clock = pygame.time.Clock()
 
@@ -210,7 +215,7 @@ while running:
             rat_x = -100
             rat_width = rat_sprite.get_width()
             rat_height = rat_sprite.get_height()
-            rats.append(pygame.Rect(rat_x, ground_y, rat_width, rat_height))
+            rats.append(Rat(rat_x, ground_y, rat_sprite))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x > - 25:
@@ -266,8 +271,14 @@ while running:
                 if bullet and bullet.colliderect(enemy):
                     bullets.remove(bullet)
                     enemies.remove(enemy)
-                    score += 1
+                    score += 150
                     hit_sound.play()
+                    floating_texts.append({
+                        "x": bullet.x + 60,
+                        "y": bullet.y + 60,
+                        "text": "150",
+                        "alpha": 255
+                    })
                     break
 
     for powerup in powerups[:]:
@@ -295,41 +306,66 @@ while running:
             if kind == "speed":
                 bullet_speed = 20
             elif kind == "shield":
-                score += 5
+                score += 250
+                floating_texts.append({
+                    "x": rect.x + 60,
+                    "y": rect.y + 60,
+                    "text": "250",
+                    "alpha": 255
+                })
             elif kind == "bomb":
                 enemies.clear()
-                score += 20
+                score += 200
+                floating_texts.append({
+                    "x": rect.x + 60,
+                    "y": rect.y + 60,
+                    "text": "200",
+                    "alpha": 255
+                })
             elif kind == "life":
                 lives += 1
-                score += 10
+                score += 100
+                floating_texts.append({
+                    "x": rect.x + 60,
+                    "y": rect.y + 60,
+                    "text": "100",
+                    "alpha": 255
+                })
             bonus_sound.play()
 
     # Movimiento de las ratas
     for rat in rats[:]:
-        rat.x += 2
-
-        if rat.x > WIDTH:
+        rat.update()  # Actualizar la posición de la rata
+        
+        if rat.rect.x > WIDTH:
             rats.remove(rat)
             continue  # Saltarse lo demás si ya se eliminó
 
-        win.blit(rat_sprite, (rat.x + 60, rat.y + 60))
+        win.blit(rat_sprite, (rat.rect.x + 60, rat.rect.y + 60))
 
         # Verificar si el jugador pasa por encima de la rata (saltó sobre ella)
-        if velocity_y > 0 and player_rect.top < rat.bottom and player_rect.bottom > rat.top:
+        if velocity_y > 0 and player_rect.x < rat.rect.x and not rat.jumped and player_rect.top < rat.rect.bottom and player_rect.bottom > rat.rect.top:
+            rat.jumped = True
             # El jugador está saltando y su parte superior pasa por encima de la rata
-            score += 4
-            bonus_sound.play()  # Sonido del bonus
+            score += 1000
+            bonus_sound.play()
+            floating_texts.append({
+                "x": rat.rect.x + 60,
+                "y": rat.rect.y + 60,
+                "text": "1000",
+                "alpha": 255
+            })
         else:
             # Detectar la colisión normal (cuando el jugador cae y toca la rata)
             if player_rect.colliderect(rat):
                 hit_sound.play()  # Sonido del impacto
-                lives -= 1  # El jugador pierde una vida
+                lives -= 1        # El jugador pierde una vida
                 rats.remove(rat)  # Eliminar la rata
 
     if score >= next_boss_score and not boss_alive:
         boss_alive = True
         boss_y = 50
-        boss_health = 1000 + (level * 20)
+        boss_health = 100 * level
         boss_x = WIDTH // 2 - boss_size // 2
         boss_bullets.clear()
 
@@ -343,12 +379,12 @@ while running:
         for bullet in bullets[:]:
             if bullet and pygame.Rect(boss_x, boss_y, boss_size, boss_size).colliderect(bullet):
                 bullets.remove(bullet)
-                boss_health -= 100
+                boss_health -= 1
                 if boss_health <= 0:
                     boss_alive = False
-                    score += 50
+                    score += 500
                     level += 1
-                    next_boss_score += 150
+                    next_boss_score *= 2
                     boss_defeat_sound.play()
 
         draw_boss_health_bar()
@@ -371,6 +407,20 @@ while running:
         # Espera 5 segundos antes de seguir
         pygame.time.delay(5000)
         sys.exit()
+
+    # Mostrar textos flotantes
+    for ft in floating_texts[:]:
+        ft["y"] -= 1  # Sube
+        ft["alpha"] -= 3  # Se desvanece
+
+        if ft["alpha"] <= 0:
+            floating_texts.remove(ft)
+            continue
+
+        floating_font = pygame.font.Font(font_path, 24)
+        floating_surface = floating_font.render(ft["text"], True, (255, 255, 0))
+        floating_surface.set_alpha(ft["alpha"])
+        win.blit(floating_surface, (ft["x"], ft["y"]))
 
     pygame.display.update()
 
