@@ -6,6 +6,8 @@ Jon Urrutia Noceda <jon@mendikat.es>
 Un videojuego en 2D lleno de enemigos, power-ups, ratas traicioneras y jefes malvados.
 Ayuda a la protagonista a sobrevivir y vencer en cada nivel… ¡o caer en el intento!
 
+<img src="screenshots/0001-game.jpg" />
+
 ---
 
 ## 🕹️ Cómo jugar
