@@ -28,10 +28,10 @@ Ayuda a la protagonista a sobrevivir y vencer en cada nivel… ¡o caer en el in
 
 ## ⚡ Power-Ups
 
-- 💙 **Speed**: Aumenta la velocidad de disparo
+- 🧪 **Speed**: Aumenta la velocidad de disparo
 - 🛡️ **Shield**: Gana puntos extra
 - 💣 **Bomb**: Elimina a todos los enemigos en pantalla
-- ❤️ **Life**: Gana una vida extra
+- ⭐ **Life**: Gana una vida extra
 
 ---
 
